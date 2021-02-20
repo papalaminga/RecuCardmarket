@@ -13,6 +13,8 @@ class CardController extends Controller
 {
     public function crearCarta(Request $request){
 
+    	Log::info('se va a comenzar la funcion de crear una carta');
+
     	$response = "";
 
 		$data = $request->getContent();
@@ -23,14 +25,17 @@ class CardController extends Controller
 
 		if(!($user->role == 'administrator')){
 
+			Log::warning('El usuario '. $user->username .' ha intentado crear una carta');
+
 			return 'acceso denegado';
 
 		}else{
 
 			if($data){
 
-            	$carta = new Card();
+				Log::info('Se van a crear una carta ');
 
+            	$carta = new Card();
             	$colecion = Colection::where('Name', $data->Colection)->first();
 
 				$carta->Name = $data->Name;
@@ -44,6 +49,8 @@ class CardController extends Controller
 
 				}else{
 
+					Log::warning('Se ha intentado crear una carta que no tiene coleccion');
+
 					$response = "no se puede crear la carta porque no existe la coleccion";
 				}
 			
@@ -51,6 +58,8 @@ class CardController extends Controller
 
 					$carta->save();
                 	
+                	Log::debug('La carta ha sido creada ' . $carta);
+
                 	$response = "Carta añadida";
 
                 
@@ -63,14 +72,13 @@ class CardController extends Controller
 
 		}
 
-		
-
 		return response($response);
     }
 
 
 
-    public function verCartas(){
+    public function verCartas()
+    {
 
 		$cartas = Card::all();
 
@@ -78,12 +86,12 @@ class CardController extends Controller
 
 		foreach ($cartas as $carta) {
 			
-			$resultado[] = [
+			$vista[] = [
 				
-				"Name" => $carta->Card,
+				"Name" => $carta->Name,
 				"Type" => $carta->Type,
 				"Description" => $carta->Description,
-				"Colection" => $carta->colection
+				"Colection" => $carta->Colection
 			];
 
 		}
@@ -91,4 +99,39 @@ class CardController extends Controller
 		return response()->json($resultado);
 
 	}
+
+	public function BuscarCartas($id)
+	{
+		Log::info('La funcion de buscar cartas ha empezado');
+
+		$comprobarExistencia = Card::where('Name', $id)->first();
+		
+		$cartas = Card::where('Name', $id)->get();
+
+		if(!$comprobarExistencia){
+
+			Log::debug("Se ha buscado la carta " . $id . " la cual no existe");
+
+			return 'esta carta no existe';
+		}
+
+		$vista = [];
+
+		foreach ($cartas as $carta) {
+			
+			$vista[] = [
+				
+				"Name" => $carta->Name,
+				"Type" => $carta->Type,
+				"Description" => $carta->Description,
+				"Colection" => $carta->Colection
+			];
+
+		}
+
+		Log::debug("Se ha buscado la carta " . $cartas . " ");
+		return response()->json($vista);
+
+	}
+	
 }

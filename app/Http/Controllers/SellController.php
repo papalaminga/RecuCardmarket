@@ -91,24 +91,61 @@ class SellController extends Controller
 
 	public function BuscarCarta($id)
 	{
+		Log::info("La funcion de Buscar cartas en venta ha comenzado");
+
+		//print_r('la id es ' . $id . ' ');
+
+		if(!$id){
+
+			Log::info("No hay ningun valor para buscar");
+
+			return "No has escrito un nombre";
+
+		}
+
+		$comprobarExistencia = Card::where('Name', $id)->first();
+
+		$comprobarCarta = Sell::where('Card', $id)->first();
 
 		$cartas = Sell::where('Card',$id)->orderBy('price','asc')->get();
 
-		$resultado = [];
+		//print($comprobarCarta);
+
+		if($comprobarCarta == null){
+
+			Log::debug("Se ha buscado la carta " . $id . " la cual no esta a la venta");
+
+			return "Oye que la carta que has escrito no esta a la venta";
+
+		}
+
+		if(!$comprobarExistencia){
+
+			Log::debug("Se ha buscado la carta " . $id . " la cual no esta a la venta ni existe en la vase de datos");
+
+			return "Oye que la carta que has escrito no esta a la venta y ni existe";
+
+		}
+
+		$vista = [];
 
 		foreach ($cartas as $carta) {
 			
-			$resultado[] = [
+			$vista[] = [
 
-				"Card" => $carta->Card,
-				"Quantity" => $carta->Quantity,
-				"Price" => $carta->Price
+			"Card" => $carta->Card,
+			"Quantity" => $carta->Quantity,
+			"Price" => $carta->Price
+
 			];
 
 		}
 
-		return response()->json($resultado);
+		Log::debug("Se ha buscado la carta " . $comprobarCarta . " ");
+		return response()->json($vista);
 	
+
 	}
+		
 
 }

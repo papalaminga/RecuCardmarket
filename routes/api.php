@@ -23,12 +23,15 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('registerCarta', 'App\Http\Controllers\CardController@crearCarta');
     Route::post('crearColeccion', 'App\Http\Controllers\ColectionController@CrearColeccion');
     Route::post('CrearVenta', 'App\Http\Controllers\SellController@CrearVenta');
+    Route::get('Buscar/{id}', 'App\Http\Controllers\SellController@BuscarCarta');
+
 
 });
 
 
 Route::get('VerVentas', 'App\Http\Controllers\SellController@VerVentas');
-Route::get('Buscar/{id}', 'App\Http\Controllers\SellController@BuscarCarta');
+
+Route::get('BuscarCartas/{id}', 'App\Http\Controllers\CardController@BuscarCartas');
 
 Route::post('password/email', 'App\Http\Controllers\UserController@forgot');
 Route::post('password/reset', 'App\Http\Controllers\UserController@reset');

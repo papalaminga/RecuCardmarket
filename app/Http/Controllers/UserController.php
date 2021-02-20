@@ -52,6 +52,8 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
+        Log::info('Comienza la funcion de crear un usuario');
+
             $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -59,8 +61,11 @@ class UserController extends Controller
             'role' => 'string',
         ]);
 
+        Log::info('Los datos para crear el usuario se han validado');
+
         if($validator->fails()){
-                return response()->json($validator->errors()->toJson(), 400);
+                Log::error('Ha ocurrido un error durante el registro');
+                return response()->json($validator->errors()->toJson(), 400);      
         }
 
         $user = User::create([
@@ -70,9 +75,14 @@ class UserController extends Controller
             'role' => $request->get('role'),
         ]);
 
+        Log::info('Los datos para crear el usuario han sido obtenidos');
+
         $token = JWTAuth::fromUser($user);
 
+        Log::debug('El usuario ' . $user . ' Se ha registrado correctamente');
+
         return response()->json(compact('user','token'),201);
+
     }
 
     public function forgot(){
